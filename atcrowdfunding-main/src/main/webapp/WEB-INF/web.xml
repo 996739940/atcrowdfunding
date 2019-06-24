@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>atcrowdfunding</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:/spring/spring-*.xml</param-value>
+	</context-param>
+
+	<!-- 监听器：用户构建IOC容器，将IOC容器存放到了application域中， 
+			Application ioc = 
+				WebApplicationContext.getWebApplicationContext(application)-->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 自定义监听器 -->
+	<listener>
+		<listener-class>com.atguigu.atcrowdfunding.listener.StartSystemListener</listener-class>
+	</listener>
+
+	<!-- 字符编码过滤器 过滤器默认只对请求过滤，对转发不过滤-->
+	<filter>
+		<filter-name>encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+
+		<!-- 通过类的set方法将属性注入 -->
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<!-- 过滤器拦截的路径 -->
+	<filter-mapping>
+		<filter-name>encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+		<!-- 过滤规则，默认只对请求过滤，对系统内部的转发不过滤，类似于构造器的规则 -->
+		<!-- <dispatcher>REQUEST</dispatcher>
+			<dispatcher>FORWARD</dispatcher> -->
+	</filter-mapping>
+
+	<!-- 支持REST风格过滤器 -->
+	<filter>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>HiddenHttpMethodFilter</filter-name>
+		<servlet-name>springmvc</servlet-name>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring/springmvc-context.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>*.htm</url-pattern><!-- 表示只跳转页面，不访问业务层 -->
+		<url-pattern>*.do</url-pattern><!-- 表示需要执行业务层逻辑代码 -->
+	</servlet-mapping>
+
+	<!-- 会话超时时间 :默认是30分钟 -->
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+
+	<!-- 页面访问欢迎页面时,url路径中可以省略欢迎页面名称 http://localhost:8080/atcrowdfunding-main/index.jsp 
+		http://localhost:8080/atcrowdfunding-main 默认访问页面 -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
